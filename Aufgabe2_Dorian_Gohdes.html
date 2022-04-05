@@ -1,0 +1,97 @@
+<html>
+
+<head>
+    <title>Mandelbrot</title>
+</head>
+
+<body>
+    <h1>Mandelbrot Computergrafik st200761</h1><br><br>
+    <canvas id="MandelbrotCanvas" width='1000' height='1000' style="border:1px solid #000000;">
+</canvas>
+
+</html>
+
+<script>
+    var c = document.getElementById("MandelbrotCanvas");
+    var ctx = c.getContext("2d");
+    var size = c.getAttribute("width");
+    var xdmin = -2.0;
+    var xddelta = 2.5;
+    var ydmin = -1.25;
+    var yddelta = 2.5;
+    var xp;
+    var xpmin = 0;
+    var xpdelta = size;
+    var yp;
+    var ypmin = 0;
+    var ypdelta = size;
+    var xd;
+    var yd;
+
+    function malen() {
+        for (xp = 0; xp < size; xp++) {
+            for (yp = 0; yp < size; yp++) {
+                xd = xdmin + xp * xddelta / xpdelta;
+                yd = ydmin + yp * yddelta / ypdelta;
+
+                var a_old = xd;
+                var b_old = yd;
+                var a_new, b_new, ab2;
+                var n;
+                for (n = 1; n < 255; n++) {
+                    a_new = a_old * a_old - b_old * b_old + xd;
+                    b_new = 2 * a_old * b_old + yd;
+                    a_old = a_new;
+                    b_old = b_new;
+                    ab2 = a_old * a_old + b_old * b_old;
+                    if (ab2 > 4) {
+                        break;
+                    }
+                }
+                if (ab2 > 4) {
+                    ctx.fillStyle = "rgb(" + n + "," + ab2 + "," + n + ")";
+                    ctx.fillRect(xp, yp, 1, 1);
+                } else {
+                    ctx.fillStyle = "rgb(0,0,0)";
+                    ctx.fillRect(xp, yp, 1, 1);
+                }
+            }
+        }
+    }
+    c.addEventListener('click', function(evt) {
+        var mousePos = getMousePos(c, evt);
+        xd = xdmin + mousePos.x * xddelta / size;
+        yd = ydmin + mousePos.y * yddelta / size;
+
+        xddelta = xddelta / 2;
+        yddelta = yddelta / 2;
+
+        xdmin = xd - xddelta / 2;
+        ydmin = yd - yddelta / 2;
+
+        malen();
+    }, false);
+
+    c.addEventListener('contextmenu', function(evt) {
+        var mousePos = getMousePos(c, evt);
+        xd = xdmin + mousePos.x * xddelta / size;
+        yd = ydmin + mousePos.y * yddelta / size;
+
+        xddelta = xddelta * 2;
+        yddelta = yddelta * 2;
+
+        xdmin = xd - xddelta / 2;
+        ydmin = yd - yddelta / 2;
+
+        malen();
+    }, false);
+
+    function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+        };
+    }
+    malen();
+</script>
